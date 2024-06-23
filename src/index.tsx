@@ -1,20 +1,22 @@
 import React from "react";
-import ReactDOM from "react-dom";
-
 import App from "./App";
 import { RecoilRoot } from "recoil";
 import { ThemeProvider } from "styled-components";
 import { darkTheme } from "./theme";
-
 import { createRoot } from "react-dom/client";
+
 const container = document.getElementById("root");
-const root = createRoot(container!); // createRoot(container!) if you use TypeScript
-root.render(
-  <React.StrictMode>
+
+if (container) {
+  const root = createRoot(container); // 'container!' assertion is unnecessary since the 'if' check ensures it is not null
+
+  root.render(
     <RecoilRoot>
       <ThemeProvider theme={darkTheme}>
         <App />
       </ThemeProvider>
     </RecoilRoot>
-  </React.StrictMode>
-);
+  );
+} else {
+  console.error("Failed to find the root element. Make sure there is an element with id 'root' in your HTML.");
+}
