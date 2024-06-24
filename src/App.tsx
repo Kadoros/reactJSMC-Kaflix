@@ -1,42 +1,73 @@
-import React from 'react';
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import React from "react";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from "react-beautiful-dnd";
+import { useRecoilState } from "recoil";
+import styled from "styled-components";
+import { todoListState } from "./atoms";
+import DraggableCard from "./components/DraggableCard";
+import Board from "./components/Board";
+
+const Wrapper = styled.div`
+  display: flex;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`;
+
+const Boards = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  gap: 10px;
+`;
 
 function App() {
-  const onDragEnd = () => {};
+  const [toDos, setToDos] = useRecoilState(todoListState);
+  const onDragEnd = (info: DropResult) => {
+    const { destination, source, draggableId } = info;
+    if (!destination) return;
+    if (destination?.droppableId === source.droppableId) {
+      setToDos((allBorads) => {
+        const boradCopy = [...allBorads[source.droppableId]];
+        const [removed] = boradCopy.splice(source.index, 1);
+        boradCopy.splice(destination?.index ?? 0, 0, removed);
+        return { ...allBorads, [source.droppableId]: boradCopy };
+      });
+    }
+    if (destination?.droppableId !== source.droppableId) {
+      setToDos((allBorads) => {
+        const sourceBoard = [...allBorads[source.droppableId]];
+        const destinationBoard = [...allBorads[destination.droppableId]];
+        const [removed] = sourceBoard.splice(source.index, 1);
+        destinationBoard.splice(destination?.index ?? 0, 0, removed);
+        return {
+          ...allBorads,
+          [source.droppableId]: sourceBoard,
+          [destination.droppableId]: destinationBoard,
+        };
+      });
+    }
+
+    /*
+     */
+  };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div>
-        <Droppable droppableId="1">
-          {(provided) => (
-            <ul {...provided.droppableProps} ref={provided.innerRef}>
-              <Draggable draggableId="one" index={0}>
-                {(provided) => (
-                  <li
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                  > <span>😂</span>
-                    Hello
-                  </li>
-                )}
-              </Draggable>
-              <Draggable draggableId="two" index={1}>
-                {(provided) => (
-                  <li
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    
-                  > <span {...provided.dragHandleProps}>😂</span>
-                    asda
-                  </li>
-                )}
-              </Draggable>
-              {provided.placeholder}
-            </ul>
-          )}
-        </Droppable>
-      </div>
+      <Wrapper>
+        <Boards>
+          {Object.keys(toDos).map((boardId) => (
+            <Board key={boardId} toDos={toDos[boardId]} boradId={boardId} />
+          ))}
+        </Boards>
+      </Wrapper>
     </DragDropContext>
   );
 }
