@@ -1,14 +1,25 @@
 import { atom, selector } from "recoil";
 
-interface IToDoListState{
-    [key: string]: string[];
+export interface IToDoState {
+    id: number;
+    text: string;
 }
 
-export const todoListState = atom<IToDoListState>({
-    key: "todoListState",
+interface IToDoListState{
+    [key: string]: IToDoState[];
+}
+
+export const toDoListState = atom<IToDoListState>({
+    key: "toDoListState",
     default: {
-        to_do: ["1", "2" ],
-        doing: ["3", "4"],
-        done: ["5"],
+        to_do: [],
+        doing: [],
+        done: [],
     },
 });
+
+export const isDraggingOverTrashBin = atom<boolean>({
+    key: "isDraggingOverTrashBin",
+    default: false,
+
+})

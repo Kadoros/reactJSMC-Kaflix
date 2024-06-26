@@ -3,6 +3,10 @@ import { styled } from "styled-components";
 import DraggableCard from "./DraggableCard";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
+import { IToDoState, toDoListState } from "../atoms";
+import { text } from "stream/consumers";
+import { useSetRecoilState } from "recoil";
+import React from "react";
 
 const Title = styled.h2`
   text-align: center;
@@ -37,9 +41,15 @@ const Area = styled.div<IAreaProps>`
   transition: background-color 0.3s ease-in-out;
   padding: 20px;
 `;
+const Form = styled.form`
+  width: 100%;
+  input {
+    width: 100%;
+  }
+`;
 
 interface IBoard {
-  toDos: string[];
+  toDos: IToDoState[];
   boradId: string;
 }
 
@@ -48,21 +58,31 @@ interface IForm {
 }
 
 function Board({ toDos, boradId }: IBoard) {
-  const {register, handleSubmit, setValue} = useForm<IForm>();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const onClick = () => {
-    inputRef.current?.focus();
-
+  const { register, handleSubmit, setValue } = useForm<IForm>();
+  const setToDos = useSetRecoilState(toDoListState);
+  const onValid = ({ toDo }: IForm) => {
+    const newToDo = {
+      id: Date.now(),
+      text: toDo,
+    };
+    setToDos((allborads) => {
+      return {
+        ...allborads,
+        [boradId]: [...allborads[boradId], newToDo],
+      };
+    });
+    setValue("toDo", "");
   };
   return (
     <Wrapper>
       <Title>{boradId}</Title>
-      <input
-        ref={inputRef}
-        type="text"
-        placeholder={`add ${boradId} task`}
-      />
-      <button onClick={onClick}>add</button>
+      <Form onSubmit={handleSubmit(onValid)}>
+        <input
+          {...register("toDo", { required: true })}
+          type="text"
+          placeholder={`Add Task on ${boradId} `}
+        />
+      </Form>
       <Droppable droppableId={boradId}>
         {(provided, snapshot) => (
           <Area
@@ -72,7 +92,12 @@ function Board({ toDos, boradId }: IBoard) {
             ref={provided.innerRef}
           >
             {toDos.map((toDo, index) => (
-              <DraggableCard key={toDo} toDo={toDo} index={index} />
+              <DraggableCard
+                key={toDo.id}
+                toDoId={toDo.id}
+                toDoText={toDo.text}
+                index={index}
+              />
             ))}
             {provided.placeholder}
           </Area>
@@ -82,4 +107,4 @@ function Board({ toDos, boradId }: IBoard) {
   );
 }
 
-export default Board;
+export default React.memo(Board);
