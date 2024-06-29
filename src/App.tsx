@@ -7,7 +7,7 @@ const Wrapper = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  flex-direction: raw;
 `;
 
 const Box = styled(motion.div)`
@@ -25,45 +25,49 @@ const Box = styled(motion.div)`
 `;
 
 const BoxVariants = {
-  invisible: {
-    x: 500,
+  entry: (isBack: boolean) => ({
+    x: isBack? -500: 500,
     opacity: 0,
     scale: 0,
-  },
-  visible: {
+  }),
+  centre: {
     opacity: 1,
     scale: 1,
     x: 0,
   },
-  exit: {
-    x: -500,
+  exit: (isBack: boolean) => ({
+    x: isBack? 500: -500,
     opacity: 0,
     scale: 0,
-  },
+  }),
 };
 
 function App() {
   const [visible, setvisible] = useState(1);
+  const [back, setback] = useState(false);
   const next = () => {
+    setback(false);
     setvisible((prev) => (prev === 10 ? 10 : prev + 1));
+  };
+  const prev = () => {
+    setback(true);
+    setvisible((prev) => (prev === 1 ? 1 : prev - 1));
   };
   return (
     <Wrapper>
-      <AnimatePresence>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) =>
-          i === visible ? (
-            <Box
-              key={i}
-              variants={BoxVariants}
-              initial="invisible"
-              animate="visible"
-              exit="exit"
-            >
-              {i}
-            </Box>
-          ) : null
-        )}
+      <AnimatePresence custom={back}>
+        <Box
+          key={visible}
+          custom={back}
+          variants={BoxVariants}
+          initial="entry"
+          animate="centre"
+          exit="exit"
+        >
+          {visible}
+        </Box>
       </AnimatePresence>
+      <button onClick={prev}>Prev</button>
       <button onClick={next}>Next</button>
     </Wrapper>
   );
