@@ -1,27 +1,13 @@
 import styled from "styled-components";
-import { circIn, delay, motion } from "framer-motion";
-import { start } from "repl";
-import { useRef } from "react";
+import { motion, useMotionValue, useTransform } from "framer-motion";
 
-const Wrapper = styled.div`
+const Wrapper = styled(motion.div)`
   height: 100vh;
   width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const BiggerBox = styled.div`
-  width: 600px;
-  height: 600px;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 40px;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
+  background: linear-gradient(135deg, rgb(238, 0, 153), rgb(221, 0, 238));
 `;
 
 const Box = styled(motion.div)`
@@ -33,28 +19,22 @@ const Box = styled(motion.div)`
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
 `;
 
-const boxVariants = {
-  hover: { scale: 1.5, rotateZ: 90 },
-  tap: { scale: 0.8, borderRadius: "100px" },
-  drag: { backgroundColor: "rgb(46,204,113)" },
-};
-
 function App() {
-  const BiggerBoxRef = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const rotateZ = useTransform(x, [-200, 200], [-360, 360]);
+  const gradientColor = useTransform(
+    x,
+    [-200, 0, 200],
+    [
+      "linear-gradient(135deg, rgb(0, 210, 238), rgb(10, 0, 10))",
+      "linear-gradient(135deg, rgb(238, 0, 153), rgb(221, 0, 238))",
+      "linear-gradient(135deg, rgb(100, 20, 2), rgb(30, 100, 100))",
+    ]
+  );
+
   return (
-    <Wrapper>
-      <BiggerBox ref={BiggerBoxRef}>
-        <Box
-          drag
-          dragElastic={0.1}
-          dragSnapToOrigin
-          dragConstraints={BiggerBoxRef}
-          variants={boxVariants}
-          whileHover="hover"
-          whileDrag="drag"
-          whileTap="tap"
-        />
-      </BiggerBox>
+    <Wrapper style={{ background: gradientColor }}>
+      <Box style={{ x, rotateZ }} drag="x" dragSnapToOrigin />
     </Wrapper>
   );
 }
