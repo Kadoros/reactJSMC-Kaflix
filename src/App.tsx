@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform, useScroll  } from "framer-motion";
 
 const Wrapper = styled(motion.div)`
-  height: 100vh;
+  height: 500vh;
   width: 100vw;
   display: flex;
   justify-content: center;
@@ -32,9 +32,11 @@ function App() {
     ]
   );
 
+  const {scrollYProgress} = useScroll ();
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.5, 1, 2]);
   return (
     <Wrapper style={{ background: gradientColor }}>
-      <Box style={{ x, rotateZ }} drag="x" dragSnapToOrigin />
+      <Box style={{ x, rotateZ, scale}} drag="x" dragSnapToOrigin />
     </Wrapper>
   );
 }
