@@ -1,9 +1,9 @@
-import React from "react";
 import App from "./App";
 import { RecoilRoot } from "recoil";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
-import { darkTheme } from "./theme";
+import { Theme } from "./theme";
 import { createRoot } from "react-dom/client";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 const container = document.getElementById("root");
 const GlobalStyle = createGlobalStyle`
@@ -61,9 +61,9 @@ table {
 body {
   font-weight: 300;
   font-family: 'Source Sans Pro', sans-serif;
-  color:black;
+  color:${props => props.theme.white.darker};
   line-height: 1.2;
-  background:linear-gradient(135deg,#e09,#d0e);
+  background:black;
 }
 a {
   text-decoration:none;
@@ -71,17 +71,23 @@ a {
 }
 `;
 
+const queryClient = new QueryClient();
+
 if (container) {
   const root = createRoot(container); // 'container!' assertion is unnecessary since the 'if' check ensures it is not null
 
   root.render(
     <RecoilRoot>
-      <ThemeProvider theme={darkTheme}>
-        <GlobalStyle />
-        <App />
-      </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={Theme}>
+          <GlobalStyle />
+          <App />
+        </ThemeProvider>
+      </QueryClientProvider>
     </RecoilRoot>
   );
 } else {
-  console.error("Failed to find the root element. Make sure there is an element with id 'root' in your HTML.");
+  console.error(
+    "Failed to find the root element. Make sure there is an element with id 'root' in your HTML."
+  );
 }
