@@ -12,7 +12,7 @@ function App() {
       <Switch>
         <Route path="/tv" component={Tv} />
         <Route path="/search" component={Search} />
-        <Route exact path="/" component={Home} />
+        <Route exact path={["/", "/movie/:movieId"]} component={Home} />
       </Switch>
     </Router>
   );
